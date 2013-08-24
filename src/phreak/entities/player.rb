@@ -61,6 +61,11 @@ module Phreak
         @world.register_observance(nil, @pos, self)
       end
 
+      def can_access?(entity)
+        return false if entity.nil?
+        entity.respond_to?(:crypto_key) && known_crypto_key?(entity.crypto_key)
+      end
+
     private
 
       def update_wiresniff(delta)
