@@ -42,14 +42,26 @@ module Phreak
     end
 
     def register_presence(old_pos, new_pos, entity)
-      frequencies = entity.frequencies
-
       if old_pos then
         ocell = @map[old_pos]
         if ocell[:presence] then
           ocell[:presence] -= [ entity ]
         end
+      end
 
+      ncell = @map[new_pos]
+      ncell[:presence] ||= []
+      ncell[:presence] << entity
+
+      register_observance(old_pos, new_pos, entity)
+
+      transmit(new_pos, entity, :visual)
+    end
+
+    def register_observance(old_pos, new_pos, entity)
+      frequencies = entity.frequencies
+
+      if old_pos then
         # Flush all the old observational data for this entity
         # TODO: DRY this up, and move it somewhere more sensible
         frequencies.each do |type, range|
@@ -65,10 +77,6 @@ module Phreak
           end
         end
       end
-
-      ncell = @map[new_pos]
-      ncell[:presence] ||= []
-      ncell[:presence] << entity
 
       # For each cell this entity can observe, register them
       # against the @observers
@@ -87,8 +95,6 @@ module Phreak
           end
         end
       end
-
-      transmit(new_pos, entity, :visual)
     end
 
     def transmit(pos, entity, frequency=:visual, data=nil)
@@ -103,12 +109,16 @@ module Phreak
   private
 
     def prepare_map
+      mdf = nil
+      idf = nil
+      cctvs = []
+      server = nil
       %w( S...................
           ....................
-          ..H.................
+          ..M.................
           ....................
           ....................
-          ......H.............
+          ......I.............
           ....................
           ....................
           ....................
@@ -132,25 +142,38 @@ module Phreak
           end
           @map[[x,y]] = cell
 
-          if character == 'P' then
+          case character
+          when 'P'
             @player.pos = [x,y]
-          elsif character == 'C' then
+          when 'C' then
             cctv = Entities::CCTV.new(self)
             register_entity(cctv)
             cctv.pos = [x,y]
-          elsif character == 'H' then
+            cctvs << cctv
+          when 'I', 'M'
             ap = Entities::AccessPoint.new(self)
             register_entity(ap)
             ap.pos = [x,y]
-          elsif character == 'S' then
+            if character == 'M' then
+              mdf = ap
+            else
+              idf = ap
+            end
+          when 'S'
             server = Entities::Server.new(self)
             register_entity(server)
             server.pos = [x,y]
           end
         end
       end
-    end
 
+      # Now associate the devices correctly
+      mdf.associate(server)
+      idf.associate(mdf)
+      cctvs.each do |cctv|
+        cctv.associate(idf)
+      end
+    end
 
   end
 end
