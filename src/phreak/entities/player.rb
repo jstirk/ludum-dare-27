@@ -50,6 +50,7 @@ module Phreak
         if @wiresniff_timer then
 
           @buffer.each do |packet|
+            next if known_crypto_key?(packet.crypto_key)
             @wiresniff_log[packet.crypto_key] ||= 0
             @wiresniff_log[packet.crypto_key] += 1
             if @wiresniff_log[packet.crypto_key] > 50 then
