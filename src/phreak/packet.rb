@@ -1,9 +1,22 @@
 module Phreak
   class Packet
-    attr_reader :source, :hops
-    def initialize(data={})
+    attr_reader :source, :hops, :data
+
+    def initialize(data={}, hops=[])
       @data = data
-      @hops = []
+      @hops = hops
+    end
+
+    def recrypt(key)
+      Packet.new(data.dup.merge(:crypto_key => key), @hops)
+    end
+
+    def encrypted?
+      !crypto_key.nil?
+    end
+
+    def crypto_key
+      data[:crypto_key]
     end
 
     def hop(entity)

@@ -103,12 +103,16 @@ module Phreak
   private
 
     def prepare_map
+      mdf = nil
+      idf = nil
+      cctvs = []
+      server = nil
       %w( S...................
           ....................
-          ..H.................
+          ..M.................
           ....................
           ....................
-          ......H.............
+          ......I.............
           ....................
           ....................
           ....................
@@ -132,25 +136,38 @@ module Phreak
           end
           @map[[x,y]] = cell
 
-          if character == 'P' then
+          case character
+          when 'P'
             @player.pos = [x,y]
-          elsif character == 'C' then
+          when 'C' then
             cctv = Entities::CCTV.new(self)
             register_entity(cctv)
             cctv.pos = [x,y]
-          elsif character == 'H' then
+            cctvs << cctv
+          when 'I', 'M'
             ap = Entities::AccessPoint.new(self)
             register_entity(ap)
             ap.pos = [x,y]
-          elsif character == 'S' then
+            if character == 'M' then
+              mdf = ap
+            else
+              idf = ap
+            end
+          when 'S'
             server = Entities::Server.new(self)
             register_entity(server)
             server.pos = [x,y]
           end
         end
       end
-    end
 
+      # Now associate the devices correctly
+      mdf.associate(server)
+      idf.associate(mdf)
+      cctvs.each do |cctv|
+        cctv.associate(idf)
+      end
+    end
 
   end
 end
