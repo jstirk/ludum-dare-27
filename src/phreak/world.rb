@@ -11,11 +11,24 @@ module Phreak
 
       @entities = {}
 
-      @player = Entities::Player.new
+      @player = Entities::Player.new(self)
       @player.pos = @map.player_pos
     end
 
     def update(container, delta)
+    end
+
+    def register_presence(old_pos, new_pos, entity)
+      if old_pos then
+        ocell = @map[old_pos]
+        if ocell[:presence] then
+          ocell[:presence] -= [ entity ]
+        end
+      end
+
+      ncell = @map[new_pos]
+      ncell[:presence] ||= []
+      ncell[:presence] << entity
     end
 
   end

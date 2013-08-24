@@ -23,6 +23,7 @@ class MapState < BasicGameState
     @ground = @sprites.getSprite(0,0)
     @wall   = @sprites.getSprite(0,1)
     @cctv   = @sprites.getSprite(2,0)
+    @player = @sprites.getSprite(3,0)
   end
 
   def render(container, game, graphics)
@@ -44,6 +45,12 @@ class MapState < BasicGameState
         cell = @map.cell(x,y)
 
         render_tile(cell, vpos[0], vpos[1], x, y)
+
+        if cell[:presence] then
+          cell[:presence].each do |entity|
+            render_entity(entity, vpos[0], vpos[1], x, y)
+          end
+        end
       end
     end
 
@@ -98,6 +105,12 @@ private
     # unless x == @x && y == @y then
     #   @ground.draw(vx, vy, 1.0)
     # end
+  end
+
+  def render_entity(entity, vx, vy, x, y)
+    image = @player
+
+    image.draw(vx, vy, 1.0)
   end
 
 end
