@@ -21,6 +21,8 @@ module Phreak
 
       @x = @player.pos[0]
       @y = @player.pos[1]
+      @ix = @x.floor
+      @iy = @y.floor
 
       @sprites = SpriteSheet.new('data/spritesheet.png', 32, 32)
       @ground = @sprites.getSprite(0,0)
@@ -43,10 +45,12 @@ module Phreak
       cells_wide = container.width / @tile_width
       cells_high = container.width / @tile_height
 
-      fx = [0, @x - (cells_wide >> 1)].max
-      fy = [0, @y - (cells_high >> 1)].max
-      cx = [@x + (cells_wide >> 1), @map.width - 1 ].min
-      cy = [@y + (cells_high >> 1), @map.height - 1].min
+      fx = [0, @ix - (cells_wide >> 1)].max
+      fy = [0, @iy - (cells_high >> 1)].max
+      cx = [@ix + (cells_wide >> 1), @map.width - 1 ].min
+      cy = [@iy + (cells_high >> 1), @map.height - 1].min
+
+      entities = []
 
       fx.upto(cx) do |x|
         fy.upto(cy) do |y|
@@ -57,17 +61,21 @@ module Phreak
           render_tile(cell, vpos[0], vpos[1], x, y)
 
           if cell[:presence] then
-            cell[:presence].each do |entity|
-              render_entity(entity, vpos[0], vpos[1], x, y)
-            end
+            entities += cell[:presence]
           end
         end
+      end
+
+      entities.each do |entity|
+        evpos = project(entity.exact_pos[0], entity.exact_pos[1])
+        epos  = entity.pos
+        render_entity(entity, evpos[0], evpos[1], epos[0], epos[1])
       end
 
       # TODO: Render overlay to target
       # TODO: Render device overlay if in that mode
 
-      graphics.draw_string("#{[@x,@y].inspect} (ESC to exit)", 8, container.height - 30)
+      graphics.draw_string("#{[@ix,@iy].inspect} (ESC to exit)", 8, container.height - 30)
     end
 
     def update(container, game, delta)
@@ -76,30 +84,34 @@ module Phreak
 
       if @map then
         touched = false
+        fragment = delta / 250.0
         if input.is_key_down(Input::KEY_A) then
-          @x -= 1
+          @x -= 1.0 * fragment
           touched = true
         end
         if input.is_key_down(Input::KEY_D) then
-          @x += 1
+          @x += 1.0 * fragment
           touched = true
         end
         if input.is_key_down(Input::KEY_W)
-          @y -= 1
+          @y -= 1.0 * fragment
           touched = true
         end
         if input.is_key_down(Input::KEY_S)
-          @y += 1
+          @y += 1.0 * fragment
           touched = true
         end
 
         if touched then
-          @x = 0 if @x < 0
-          @y = 0 if @y < 0
+          @x = 0 if @x < 0.0
+          @y = 0 if @y < 0.0
           @x = @map.width-1 if @x >= @map.width
           @y = @map.height-1 if @y >= @map.height
 
-          @player.pos = [@x,@y]
+          @ix = @x.floor
+          @iy = @y.floor
+
+          @player.exact_pos = [ @x,@y ]
         end
       end
 
