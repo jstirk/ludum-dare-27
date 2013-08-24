@@ -97,12 +97,21 @@ module Phreak
       @world.update(container, delta)
     end
 
+    def mouseClicked(button, x, y, count)
+      pos = deproject(x,y)
+      puts "CLICKED: #{pos.inspect}"
+    end
+
   private
 
     # Projects a tile [x,y] coordinate into a screen coordinate, taking
     # the current viewport into account.
     def project(x,y)
       [ @ox + (x * @tile_width), @oy + (y * @tile_height) ]
+    end
+
+    def deproject(vx,vy)
+      [ ((vx - @ox) / @tile_width.to_f).floor, ((vy - @oy) / @tile_height.to_f).floor ]
     end
 
     def render_tile(cell, vx, vy, x, y)
