@@ -49,18 +49,18 @@ module Phreak
           @buffer.each do |packet|
             @wiresniff_log[packet.crypto_key] ||= 0
             @wiresniff_log[packet.crypto_key] += 1
-            if @wiresniff_log[packet.crypto_key] > 10 then
+            if @wiresniff_log[packet.crypto_key] > 50 then
               # HOLY CRAP WE UNLOCKED IT
               @known_crypto_keys << packet.crypto_key
 
               puts "UNLOCKED #{packet.crypto_key}!!!!"
-              @wiresniff_timer = 15000
+              @wiresniff_timer = Phreak::TIME
               break
             end
           end
 
           @wiresniff_timer += delta
-          if @wiresniff_timer >= 15000 then
+          if @wiresniff_timer >= Phreak::TIME then
             @wiresniff_timer = nil
             @world.register_observance(nil, @pos, self)
           end

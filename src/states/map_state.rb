@@ -131,7 +131,9 @@ module Phreak
           @current_target.disable!
         end
       when '2'
-        @game.player.wiresniff!
+        if @device then
+          @game.player.wiresniff!
+        end
       end
     end
 
