@@ -17,6 +17,8 @@ class MapState < BasicGameState
 
     @x = game.player.pos[0]
     @y = game.player.pos[1]
+
+    @ground = Image.new('data/tiles/ground.png')
   end
 
   def render(container, game, graphics)
@@ -37,7 +39,7 @@ class MapState < BasicGameState
 
         cell = @map.cell(x,y)
 
-        render_tile(graphics, cell, vpos[0], vpos[1], x, y)
+        render_tile(cell, vpos[0], vpos[1], x, y)
       end
     end
 
@@ -66,8 +68,6 @@ class MapState < BasicGameState
       @y = 0 if @y < 0
       @x = @map.width-1 if @x >= @map.width
       @y = @map.height-1 if @y >= @map.height
-
-      puts [@x,@y, @ox, @oy].inspect
     end
 
     @world.update(container, delta)
@@ -81,13 +81,10 @@ private
     [ @ox + (x * @tile_width), @oy + (y * @tile_height) ]
   end
 
-  def render_tile(graphics, cell, vx, vy, x, y)
-    graphics.setColor(Color.new(255,255,255,255))
-    if x == @x && y == @y then
-      graphics.setColor(Color.new(255,0,255,255))
+  def render_tile(cell, vx, vy, x, y)
+    unless x == @x && y == @y then
+      @ground.draw(vx, vy, 1.0)
     end
-
-    graphics.drawRect(vx,vy, @tile_width, @tile_height)
   end
 
 end
