@@ -18,7 +18,7 @@ module Phreak
         init_disableable
         init_transmitter
 
-        @frequencies = { :wifi => 20 }
+        @frequencies = { :wifi => 15 }
       end
 
       def active?

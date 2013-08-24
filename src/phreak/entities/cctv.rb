@@ -19,7 +19,7 @@ module Phreak
         init_transmitter
 
         @motion = false
-        @frequencies = { :wifi => 10, :visual => 5 }
+        @frequencies = { :visual => 5 }
       end
 
       def update(delta)

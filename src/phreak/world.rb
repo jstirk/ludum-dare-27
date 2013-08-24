@@ -97,8 +97,14 @@ module Phreak
       end
     end
 
-    def observed?(pos, frequency)
-      @observers[frequency] && @observers[frequency][pos] && @observers[frequency][pos].count > 0
+    def observed?(pos, frequency, entity=nil)
+      if @observers[frequency] && @observers[frequency][pos] then
+        if entity.nil? then
+          return @observers[frequency][pos].count > 0
+        else
+          return @observers[frequency][pos].include?(entity.id)
+        end
+      end
     end
 
     def transmit(pos, entity, frequency=:visual, data=nil)

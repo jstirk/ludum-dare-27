@@ -35,7 +35,8 @@ module Phreak
       @target_connected    = @sprites.getSprite(0,2)
       @target_disconnected = @sprites.getSprite(2,2)
 
-      @observed_overlay = @sprites.getSprite(0,3)
+      @visual_overlay = @sprites.getSprite(0,3)
+      @wifi_overlay = @sprites.getSprite(1,3)
 
       @phone = Image.new('data/phone.png')
     end
@@ -57,7 +58,8 @@ module Phreak
       cy = [@iy + (cells_high >> 1), @map.height - 1].min
 
       entities = []
-      overlay  = []
+      visual_overlay  = []
+      wifi_overlay = []
 
       fx.upto(cx) do |x|
         fy.upto(cy) do |y|
@@ -72,15 +74,31 @@ module Phreak
           end
 
           if @world.observed?([x,y], :visual) then
-            overlay << [x,y]
+            visual_overlay << [x,y]
+          end
+
+          if @world.observed?([x,y], :wifi, @player) then
+            wifi_overlay << [x,y]
+          elsif @player.current_target && @world.observed?([x,y], :wifi, @player.current_target) then
+            if !@player.current_target.respond_to?(:disabled?) || !@player.current_target.disabled? then
+              wifi_overlay << [x,y]
+            end
           end
         end
       end
 
-      overlay.each do |pos|
+      if @device then
+        wifi_overlay.each do |pos|
+          ovpos = project(pos[0], pos[1])
+          render_overlay(:wifi, ovpos[0], ovpos[1], pos[0], pos[1])
+        end
+      end
+
+      visual_overlay.each do |pos|
         ovpos = project(pos[0], pos[1])
         render_overlay(:visual, ovpos[0], ovpos[1], pos[0], pos[1])
       end
+
 
       entities.each do |entity|
         evpos = project(entity.exact_pos[0], entity.exact_pos[1])
@@ -211,18 +229,31 @@ module Phreak
       end
 
       # Render connection overlay
-      @overlay_line_color ||= Color.new(0,0,255,255)
-      if @player.can_access?(entity) then
-        entity.associated_entities.each do |oentity|
-          epos = project(oentity.exact_pos[0], oentity.exact_pos[1])
-          @graphics.drawGradientLine(vx + (@tile_width / 2), vy + (@tile_height / 2), @overlay_line_color,
-                                     epos[0] + (@tile_width / 2), epos[1] + (@tile_height / 2), @overlay_line_color)
+      if @device then
+        @overlay_line_color ||= Color.new(0,0,255,255)
+        @disabled_overlay_line_color ||= Color.new(255,0,0,255)
+        if entity.respond_to?(:disabled?) && entity.disabled? then
+          color = @disabled_overlay_line_color
+        else
+          color = @overlay_line_color
+        end
+        if @player.can_access?(entity) then
+          entity.associated_entities.each do |oentity|
+            epos = project(oentity.exact_pos[0], oentity.exact_pos[1])
+            @graphics.drawGradientLine(vx + (@tile_width / 2), vy + (@tile_height / 2), color,
+                                       epos[0] + (@tile_width / 2), epos[1] + (@tile_height / 2), color)
+          end
         end
       end
     end
 
     def render_overlay(type, vx, vy, x, y)
-      @observed_overlay.draw(vx, vy, 1.0)
+      case type
+      when :visual
+        @visual_overlay.draw(vx, vy, 1.0)
+      when :wifi
+        @wifi_overlay.draw(vx, vy, 1.0)
+      end
     end
 
     def render_device_overlay
