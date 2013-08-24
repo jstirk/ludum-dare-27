@@ -36,11 +36,14 @@ module Phreak
       @target_disconnected = @sprites.getSprite(2,2)
 
       @observed_overlay = @sprites.getSprite(0,3)
+
+      @phone = Image.new('data/phone.png')
     end
 
     def render(container, game, graphics)
       @targets = {}
       @graphics = graphics
+      @container = container
 
       @ox = (container.width >> 1) - (@x * @tile_width) - (@tile_width / 2)
       @oy = (container.height >> 1) - (@y * @tile_height) - (@tile_height / 2)
@@ -85,8 +88,8 @@ module Phreak
         render_entity(entity, evpos[0], evpos[1], epos[0], epos[1])
       end
 
-      # TODO: Render overlay to target
-      # TODO: Render device overlay if in that mode
+      # Render device overlay if in that mode
+      render_device_overlay
 
       graphics.draw_string("#{[@ix,@iy].inspect} (ESC to exit)", 8, container.height - 30)
     end
@@ -149,13 +152,8 @@ module Phreak
       when '`'
         # Open or close the device
         @device = !@device
-
-        if @device then
-          puts "1. DISABLE"
-          puts "1. SNIFF"
-        end
       when '1'
-        if @device && @player.current_target && @player.current_target.respond_to?(:disable!) then
+        if @device && @player.can_access?(@player.current_target) && @player.current_target.respond_to?(:disable!) then
           @player.current_target.disable!
         end
       when '2'
@@ -205,7 +203,7 @@ module Phreak
       image.draw(vx, vy, 1.0)
 
       if entity == @player.current_target then
-        if !entity.respond_to?(:crypto_key) || @player.known_crypto_key?(entity.crypto_key) then
+        if @player.can_access?(entity) then
           @target_connected.draw(vx, vy, 1.0)
         else
           @target_disconnected.draw(vx, vy, 1.0)
@@ -214,15 +212,42 @@ module Phreak
 
       # Render connection overlay
       @overlay_line_color ||= Color.new(0,0,255,255)
-      entity.associated_entities.each do |oentity|
-        epos = project(oentity.exact_pos[0], oentity.exact_pos[1])
-        @graphics.drawGradientLine(vx + (@tile_width / 2), vy + (@tile_height / 2), @overlay_line_color,
-                                   epos[0] + (@tile_width / 2), epos[1] + (@tile_height / 2), @overlay_line_color)
+      if @player.can_access?(entity) then
+        entity.associated_entities.each do |oentity|
+          epos = project(oentity.exact_pos[0], oentity.exact_pos[1])
+          @graphics.drawGradientLine(vx + (@tile_width / 2), vy + (@tile_height / 2), @overlay_line_color,
+                                     epos[0] + (@tile_width / 2), epos[1] + (@tile_height / 2), @overlay_line_color)
+        end
       end
     end
 
     def render_overlay(type, vx, vy, x, y)
       @observed_overlay.draw(vx, vy, 1.0)
+    end
+
+    def render_device_overlay
+      if @device then
+        @default_font_color ||= Color.new(255,255,255,255)
+        @device_font_color ||= Color.new(29,30,25,255)
+        ox = 30
+        oy = @container.height - 400
+        @phone.draw(ox, oy, 2.0)
+
+        @graphics.setColor(@device_font_color)
+        case @player.device_state
+        when :sniffing
+          @graphics.draw_string("WIRESNIFF", ox + 20, oy + 60)
+          vy = oy + 60
+          @player.wiresniff_stats.each do |key, progress|
+            vy += 20
+            @graphics.draw_string(sprintf('%05d (%2.1f%%)', key, progress), ox + 20, vy)
+          end
+        else
+          @graphics.draw_string("1. DISABLE", ox + 20, oy + 60) if @player.can_access?(@player.current_target)
+          @graphics.draw_string("2. SNIFF", ox + 20, oy + 80)
+        end
+        @graphics.setColor(@default_font_color)
+      end
     end
 
   end
