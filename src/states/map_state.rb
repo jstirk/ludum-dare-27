@@ -152,6 +152,7 @@ module Phreak
 
         if @device then
           puts "1. DISABLE"
+          puts "1. SNIFF"
         end
       when '1'
         if @device && @player.current_target && @player.current_target.respond_to?(:disable!) then
