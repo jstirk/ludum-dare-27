@@ -28,9 +28,12 @@ module Phreak
       @cctv_cold = @sprites.getSprite(0,1)
       @cctv_hot  = @sprites.getSprite(1,1)
 
+      @target_ui = @sprites.getSprite(1,2)
     end
 
     def render(container, game, graphics)
+      @targets = {}
+
       @ox = (container.width >> 1) - (@x * @tile_width) - (@tile_width / 2)
       @oy = (container.height >> 1) - (@y * @tile_height) - (@tile_height / 2)
 
@@ -57,6 +60,9 @@ module Phreak
           end
         end
       end
+
+      # TODO: Render overlay to target
+      # TODO: Render device overlay if in that mode
 
       graphics.draw_string("#{[@x,@y].inspect} (ESC to exit)", 8, container.height - 30)
     end
@@ -97,12 +103,45 @@ module Phreak
       @world.update(container, delta)
     end
 
+    def mouseClicked(button, x, y, count)
+      pos = deproject(x,y)
+      target = @targets[pos]
+      puts "CLICKED: #{pos.inspect} = #{target.inspect}"
+      @current_target = target
+    end
+
+    def keyPressed(key, char_code)
+      # TODO: Tones on numberpad if device is open
+    end
+
+    def keyReleased(key, char_code)
+      char = char_code.chr
+
+      case char
+      when '`'
+        # Open or close the device
+        @device = !@device
+
+        if @device then
+          puts "1. DISABLE"
+        end
+      when '1'
+        if @device && @current_target && @current_target.respond_to?(:disable!) then
+          @current_target.disable!
+        end
+      end
+    end
+
   private
 
     # Projects a tile [x,y] coordinate into a screen coordinate, taking
     # the current viewport into account.
     def project(x,y)
       [ @ox + (x * @tile_width), @oy + (y * @tile_height) ]
+    end
+
+    def deproject(vx,vy)
+      [ ((vx - @ox) / @tile_width.to_f).floor, ((vy - @oy) / @tile_height.to_f).floor ]
     end
 
     def render_tile(cell, vx, vy, x, y)
@@ -120,6 +159,7 @@ module Phreak
       when Entities::Player
         @player
       when Entities::CCTV, Entities::AccessPoint, Entities::Server
+        @targets[[x,y]] = entity
         if entity.active? then
           @cctv_hot
         else
@@ -130,6 +170,10 @@ module Phreak
       end
 
       image.draw(vx, vy, 1.0)
+
+      if entity == @current_target then
+        @target_ui.draw(vx, vy, 1.0)
+      end
     end
 
   end

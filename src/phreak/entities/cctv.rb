@@ -1,23 +1,27 @@
 require 'phreak/entities/base'
 require 'phreak/entities/concerns/transmitter'
+require 'phreak/entities/concerns/disableable'
 
 module Phreak
   module Entities
     class CCTV < Base
 
       include Concerns::Transmitter
+      include Concerns::Disableable
 
       def initialize(world)
         super
 
-       init_transmitter
+        init_disableable
+        init_transmitter
 
         @motion = false
         @frequencies = { :wifi => 10, :visual => 5 }
       end
 
       def update(delta)
-        update_transmitter(delta)
+        update_disableable(delta)
+        update_transmitter(delta) unless disabled?
       end
 
       def active?
@@ -25,12 +29,14 @@ module Phreak
       end
 
       def observe(pos, entity, frequency, data)
-        if frequency == :visual then
-          case entity
-          when Player
-            @buffer << Packet.new({ :target => entity, :pos => pos })
-          else
-            @motion = true
+        unless disabled? then
+          if frequency == :visual then
+            case entity
+            when Player
+              @buffer << Packet.new({ :target => entity, :pos => pos })
+            else
+              @motion = true
+            end
           end
         end
       end
