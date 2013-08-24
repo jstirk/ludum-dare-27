@@ -17,7 +17,7 @@ module Phreak
       end
 
       def frequencies
-        freq = { :visual => 10, :wifi => 10 }
+        freq = { :visual => 10, :wifi => 6 }
         freq
       end
 
