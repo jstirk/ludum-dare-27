@@ -34,6 +34,8 @@ module Phreak
 
       @target_connected    = @sprites.getSprite(0,2)
       @target_disconnected = @sprites.getSprite(2,2)
+
+      @observed_overlay = @sprites.getSprite(0,3)
     end
 
     def render(container, game, graphics)
@@ -51,6 +53,7 @@ module Phreak
       cy = [@iy + (cells_high >> 1), @map.height - 1].min
 
       entities = []
+      overlay  = []
 
       fx.upto(cx) do |x|
         fy.upto(cy) do |y|
@@ -63,7 +66,16 @@ module Phreak
           if cell[:presence] then
             entities += cell[:presence]
           end
+
+          if @world.observed?([x,y], :visual) then
+            overlay << [x,y]
+          end
         end
+      end
+
+      overlay.each do |pos|
+        ovpos = project(pos[0], pos[1])
+        render_overlay(:visual, ovpos[0], ovpos[1], pos[0], pos[1])
       end
 
       entities.each do |entity|
@@ -197,6 +209,10 @@ module Phreak
           @target_disconnected.draw(vx, vy, 1.0)
         end
       end
+    end
+
+    def render_overlay(type, vx, vy, x, y)
+      @observed_overlay.draw(vx, vy, 1.0)
     end
 
   end
