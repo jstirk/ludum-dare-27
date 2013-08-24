@@ -27,6 +27,9 @@ module Phreak
     alias :inspect :to_s
 
     def update(container, delta)
+      @entities.each do |id, entity|
+        entity.update(delta)
+      end
     end
 
     def register_entity(entity)

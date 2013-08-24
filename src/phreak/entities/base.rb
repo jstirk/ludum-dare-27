@@ -26,6 +26,11 @@ module Phreak
       def observe(pos, entity)
       end
 
+      # Callback for every update tick in the game. Override in
+      # subclasses.
+      def update(delta)
+      end
+
       def view_radius
         5
       end
