@@ -7,6 +7,7 @@ module Phreak
       def view_radius
         10
       end
+
     end
   end
 end

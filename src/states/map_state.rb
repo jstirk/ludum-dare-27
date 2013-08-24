@@ -119,8 +119,8 @@ module Phreak
       image = case entity
       when Entities::Player
         @player
-      when Entities::CCTV
-        if entity.alerted? then
+      when Entities::CCTV, Entities::AccessPoint, Entities::Server
+        if entity.active? then
           @cctv_hot
         else
           @cctv_cold
