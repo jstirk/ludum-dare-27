@@ -26,13 +26,11 @@ module Phreak
           if @buffer && @known_crypto_keys.size > 0 then
             @buffer.each do |packet|
               if !packet.encrypted? || packet.crypto_key == @crypto_key then
-                puts "#{self.inspect} RE-ENCRYPTING: #{packet.inspect}"
                 new_packets = []
                 @known_crypto_keys.each do |key|
                   next if key == @crypto_key
                   new_packet = packet.recrypt(key)
                   new_packets << new_packet
-                  puts "  -> ENCRYPTED WITH #{key}"
                 end
                 @buffer -= [packet]
                 @buffer += new_packets

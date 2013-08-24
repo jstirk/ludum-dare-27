@@ -13,7 +13,8 @@ module Phreak
       @tile_width = 32
       @tile_height = 32
 
-      @world = game.world
+      @game  = game
+      @world = @game.world
 
       @map = @world.map
 
@@ -129,6 +130,8 @@ module Phreak
         if @device && @current_target && @current_target.respond_to?(:disable!) then
           @current_target.disable!
         end
+      when '2'
+        @game.player.wiresniff!
       end
     end
 

@@ -42,14 +42,26 @@ module Phreak
     end
 
     def register_presence(old_pos, new_pos, entity)
-      frequencies = entity.frequencies
-
       if old_pos then
         ocell = @map[old_pos]
         if ocell[:presence] then
           ocell[:presence] -= [ entity ]
         end
+      end
 
+      ncell = @map[new_pos]
+      ncell[:presence] ||= []
+      ncell[:presence] << entity
+
+      register_observance(old_pos, new_pos, entity)
+
+      transmit(new_pos, entity, :visual)
+    end
+
+    def register_observance(old_pos, new_pos, entity)
+      frequencies = entity.frequencies
+
+      if old_pos then
         # Flush all the old observational data for this entity
         # TODO: DRY this up, and move it somewhere more sensible
         frequencies.each do |type, range|
@@ -65,10 +77,6 @@ module Phreak
           end
         end
       end
-
-      ncell = @map[new_pos]
-      ncell[:presence] ||= []
-      ncell[:presence] << entity
 
       # For each cell this entity can observe, register them
       # against the @observers
@@ -87,8 +95,6 @@ module Phreak
           end
         end
       end
-
-      transmit(new_pos, entity, :visual)
     end
 
     def transmit(pos, entity, frequency=:visual, data=nil)
