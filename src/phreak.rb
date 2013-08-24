@@ -18,6 +18,9 @@ require 'phreak/world'
 # require 'phreak/ui_handler'
 
 module Phreak
+
+  TIME = 10000 # 10 seconds!
+
   class Game < StateBasedGame
 
     attr_reader :world, :ui_handler
