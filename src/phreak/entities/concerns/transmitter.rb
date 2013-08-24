@@ -14,6 +14,7 @@ module Phreak
           if @transmit_time >= 1000 then
 
             @buffer.each do |data|
+              data.hop(self)
               @world.transmit(@pos, self, @transmit_frequency, data)
             end
 

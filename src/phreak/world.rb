@@ -1,6 +1,8 @@
+require 'phreak/packet'
 require 'phreak/entities/player'
 require 'phreak/entities/cctv'
 require 'phreak/entities/access_point'
+require 'phreak/entities/server'
 require 'phreak/map'
 
 module Phreak
@@ -89,7 +91,7 @@ module Phreak
       transmit(new_pos, entity, :visual)
     end
 
-    def transmit(pos, entity, frequency=:visual, data={})
+    def transmit(pos, entity, frequency=:visual, data=nil)
       if @observers[frequency] && @observers[frequency][pos] then
         @observers[frequency][pos].each do |id, observer|
           next if observer == entity
@@ -103,7 +105,7 @@ module Phreak
     def prepare_map
       %w( S...................
           ....................
-          ....................
+          ..H.................
           ....................
           ....................
           ......H.............
@@ -140,6 +142,10 @@ module Phreak
             ap = Entities::AccessPoint.new(self)
             register_entity(ap)
             ap.pos = [x,y]
+          elsif character == 'S' then
+            server = Entities::Server.new(self)
+            register_entity(server)
+            server.pos = [x,y]
           end
         end
       end

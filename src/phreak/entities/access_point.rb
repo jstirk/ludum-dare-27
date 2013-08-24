@@ -24,8 +24,8 @@ module Phreak
       end
 
       def observe(pos, entity, frequency, data)
-        puts [self, pos, entity, data].inspect
         if frequency == :wifi then
+          return if data.hopped?(self)
           @buffer << data
         end
       end

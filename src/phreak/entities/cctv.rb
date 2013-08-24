@@ -28,7 +28,7 @@ module Phreak
         if frequency == :visual then
           case entity
           when Player
-            @buffer << { :target => entity, :pos => pos, :source => @id }
+            @buffer << Packet.new({ :target => entity, :pos => pos })
           else
             @motion = true
           end
