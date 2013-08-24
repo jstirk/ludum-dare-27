@@ -4,6 +4,8 @@ require 'phreak/map'
 module Phreak
   class World
 
+    attr_reader :map, :player, :entities
+
     def initialize
       @map = Map.new(40,40)
 
@@ -13,7 +15,7 @@ module Phreak
       @player.pos = [20,20]
     end
 
-    def update(delta)
+    def update(container, delta)
     end
 
   end

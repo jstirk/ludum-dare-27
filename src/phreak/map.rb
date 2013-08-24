@@ -1,7 +1,11 @@
 module Phreak
   class Map
 
+    attr_reader :width, :height
+
     def initialize(width, height)
+      @width = width
+      @height = height
       @cells = {}
     end
 
@@ -10,7 +14,7 @@ module Phreak
     end
 
     def [](pos)
-      @cell[pos] || {}
+      @cells[pos] || {}
     end
 
   end
