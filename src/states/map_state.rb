@@ -232,8 +232,18 @@ module Phreak
         @phone.draw(ox, oy, 2.0)
 
         @graphics.setColor(@device_font_color)
-        @graphics.draw_string("1. DISABLE", ox + 20, oy + 60)
-        @graphics.draw_string("2. SNIFF", ox + 20, oy + 80)
+        case @player.device_state
+        when :sniffing
+          @graphics.draw_string("WIRESNIFF", ox + 20, oy + 60)
+          vy = oy + 60
+          @player.wiresniff_stats.each do |key, progress|
+            vy += 20
+            @graphics.draw_string(sprintf('%05d (%2.1f%%)', key, progress), ox + 20, vy)
+          end
+        else
+          @graphics.draw_string("1. DISABLE", ox + 20, oy + 60)
+          @graphics.draw_string("2. SNIFF", ox + 20, oy + 80)
+        end
         @graphics.setColor(@default_font_color)
       end
     end

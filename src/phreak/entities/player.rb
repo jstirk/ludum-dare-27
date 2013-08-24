@@ -5,6 +5,8 @@ module Phreak
   module Entities
     class Player < Base
 
+      CRACK_PACKETS_REQUIRED = 50
+
       include Concerns::Encryptable
 
       attr_accessor :current_target
@@ -28,6 +30,22 @@ module Phreak
         @buffer = []
       end
 
+      def device_state
+        if @wiresniff_timer then
+          :sniffing
+        else
+          nil
+        end
+      end
+
+      def wiresniff_stats
+        out = {}
+        @wiresniff_log.each do |key, count|
+          out[key] = (count / CRACK_PACKETS_REQUIRED.to_f) * 100.0
+        end
+        out
+      end
+
       def observe(pos, entity, frequency, data)
         if frequency == :wifi then
           return if @wiresniff_timer.nil? && data.encrypted? && !known_crypto_key?(data.crypto_key)
@@ -38,7 +56,6 @@ module Phreak
       end
 
       def wiresniff!
-        puts "SNIFF SNIFF!"
         @wiresniff_timer = 0
         @wiresniff_log = {}
         @world.register_observance(nil, @pos, self)
@@ -53,7 +70,7 @@ module Phreak
             next if known_crypto_key?(packet.crypto_key)
             @wiresniff_log[packet.crypto_key] ||= 0
             @wiresniff_log[packet.crypto_key] += 1
-            if @wiresniff_log[packet.crypto_key] > 50 then
+            if @wiresniff_log[packet.crypto_key] > CRACK_PACKETS_REQUIRED then
               # HOLY CRAP WE UNLOCKED IT
               @known_crypto_keys << packet.crypto_key
 
