@@ -7,12 +7,12 @@ module Phreak
     attr_reader :map, :player, :entities
 
     def initialize
-      @map = Map.new(40,40)
+      @map = Map.new(20,20)
 
       @entities = {}
 
       @player = Entities::Player.new
-      @player.pos = [20,20]
+      @player.pos = @map.player_pos
     end
 
     def update(container, delta)

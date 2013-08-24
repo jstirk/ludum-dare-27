@@ -1,5 +1,6 @@
 java_import org.newdawn.slick.state.BasicGameState
 java_import org.newdawn.slick.Color
+java_import org.newdawn.slick.SpriteSheet
 
 class MapState < BasicGameState
 
@@ -18,7 +19,10 @@ class MapState < BasicGameState
     @x = game.player.pos[0]
     @y = game.player.pos[1]
 
-    @ground = Image.new('data/tiles/ground.png')
+    @sprites = SpriteSheet.new('data/spritesheet.png', 32, 32)
+    @ground = @sprites.getSprite(0,0)
+    @wall   = @sprites.getSprite(0,1)
+    @cctv   = @sprites.getSprite(2,0)
   end
 
   def render(container, game, graphics)
@@ -82,9 +86,18 @@ private
   end
 
   def render_tile(cell, vx, vy, x, y)
-    unless x == @x && y == @y then
-      @ground.draw(vx, vy, 1.0)
+    image = case cell[:type]
+    when :wall
+      @wall
+    when :cctv
+      @cctv
+    else
+      @ground
     end
+    image.draw(vx, vy, 1.0)
+    # unless x == @x && y == @y then
+    #   @ground.draw(vx, vy, 1.0)
+    # end
   end
 
 end
