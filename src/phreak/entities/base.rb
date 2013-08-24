@@ -1,6 +1,6 @@
 module Phreak
   module Entities
-    # Shared logic across all the humanesque entities.
+    # Shared logic across all the entities.
     class Base
 
       attr_accessor :pos, :id
