@@ -22,9 +22,12 @@ module Phreak
 
       @sprites = SpriteSheet.new('data/spritesheet.png', 32, 32)
       @ground = @sprites.getSprite(0,0)
-      @wall   = @sprites.getSprite(0,1)
-      @cctv   = @sprites.getSprite(2,0)
+      @wall   = @sprites.getSprite(1,0)
       @player = @sprites.getSprite(3,0)
+
+      @cctv_cold = @sprites.getSprite(0,1)
+      @cctv_hot  = @sprites.getSprite(1,1)
+
     end
 
     def render(container, game, graphics)
@@ -117,7 +120,11 @@ module Phreak
       when Entities::Player
         @player
       when Entities::CCTV
-        @cctv
+        if entity.alerted? then
+          @cctv_hot
+        else
+          @cctv_cold
+        end
       else
         @cctv
       end

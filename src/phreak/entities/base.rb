@@ -16,6 +16,20 @@ module Phreak
         @pos = new_pos
       end
 
+      def alerted?
+        @alerted
+      end
+
+      # Callback when the given entity moves into the position.
+      # Should be overridden in subclasses to handle action on seeing
+      # someone.
+      def observe(pos, entity)
+      end
+
+      def view_radius
+        5
+      end
+
     end
   end
 end
