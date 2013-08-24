@@ -85,9 +85,9 @@ configuration do |c|
 	# Undocumented option 'extra_user_jars'
 	# default value: {}
 	#
-	#c.extra_user_jars[:data] = { :directory => 'data/images/png',
-	#                             :location_in_jar => 'images',
-	#                             :exclude => /*.bak$/ }
+	c.extra_user_jars[:data] = { :directory => 'data/',
+	                            :location_in_jar => 'data',
+	                            :exclude => /.*acorn$/ }
 
 	# Undocumented option 'verbose'
 	# default value: false
