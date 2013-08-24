@@ -30,7 +30,8 @@ module Phreak
       @cctv_cold = @sprites.getSprite(0,1)
       @cctv_hot  = @sprites.getSprite(1,1)
 
-      @target_ui = @sprites.getSprite(1,2)
+      @target_connected    = @sprites.getSprite(0,2)
+      @target_disconnected = @sprites.getSprite(2,2)
     end
 
     def render(container, game, graphics)
@@ -178,7 +179,11 @@ module Phreak
       image.draw(vx, vy, 1.0)
 
       if entity == @player.current_target then
-        @target_ui.draw(vx, vy, 1.0)
+        if !entity.respond_to?(:crypto_key) || @player.known_crypto_key?(entity.crypto_key) then
+          @target_connected.draw(vx, vy, 1.0)
+        else
+          @target_disconnected.draw(vx, vy, 1.0)
+        end
       end
     end
 
