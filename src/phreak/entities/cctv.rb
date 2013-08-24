@@ -1,37 +1,37 @@
 require 'phreak/entities/base'
+require 'phreak/entities/concerns/transmitter'
 
 module Phreak
   module Entities
     class CCTV < Base
 
+      include Concerns::Transmitter
+
       def initialize(world)
         super
 
+       init_transmitter
+
         @motion = false
-        @buffer = []
-        @transmit_time = 0
+        @frequencies = { :wifi => 10, :visual => 5 }
       end
 
       def update(delta)
-        @transmit_time += delta
-        if @transmit_time >= 5000 then
-          @motion = false
-          @buffer = []
-          @transmit_time = 0
-        end
+        update_transmitter(delta)
       end
 
-      def alerted?
+      def active?
         @motion || @buffer.size > 0
       end
 
-      def observe(pos, entity)
-        # TODO: Log this sight in my buffer to send out next update
-        case entity
-        when Player
-          @buffer << { :target => entity, :pos => pos }
-        else
-          @motion = true
+      def observe(pos, entity, frequency, data)
+        if frequency == :visual then
+          case entity
+          when Player
+            @buffer << { :target => entity, :pos => pos, :source => @id }
+          else
+            @motion = true
+          end
         end
       end
 
