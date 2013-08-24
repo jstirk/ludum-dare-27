@@ -40,6 +40,7 @@ module Phreak
 
     def render(container, game, graphics)
       @targets = {}
+      @graphics = graphics
 
       @ox = (container.width >> 1) - (@x * @tile_width) - (@tile_width / 2)
       @oy = (container.height >> 1) - (@y * @tile_height) - (@tile_height / 2)
@@ -208,6 +209,14 @@ module Phreak
         else
           @target_disconnected.draw(vx, vy, 1.0)
         end
+      end
+
+      # Render connection overlay
+      @overlay_line_color ||= Color.new(0,0,255,255)
+      entity.associated_entities.each do |oentity|
+        epos = project(oentity.exact_pos[0], oentity.exact_pos[1])
+        @graphics.drawGradientLine(vx + (@tile_width / 2), vy + (@tile_height / 2), @overlay_line_color,
+                                   epos[0] + (@tile_width / 2), epos[1] + (@tile_height / 2), @overlay_line_color)
       end
     end
 

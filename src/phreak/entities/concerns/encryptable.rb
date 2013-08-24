@@ -3,17 +3,19 @@ module Phreak
     module Concerns
       module Encryptable
 
-        attr_reader :crypto_key
+        attr_reader :crypto_key, :associated_entities
 
         def init_encryptable
           @crypto_key = Kernel::rand(99999)
           @known_crypto_keys = [ @crypto_key ]
+          @associated_entities = []
         end
 
         # Associates this entity with another entity, storing the remote
         # association key in our list of known keys
         def associate(entity)
           puts "#{self.inspect} associating with #{entity.inspect} = #{entity.crypto_key}"
+          @associated_entities << entity
           @known_crypto_keys << entity.crypto_key
           @known_crypto_keys.uniq!
         end
