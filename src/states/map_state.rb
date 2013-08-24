@@ -79,6 +79,8 @@ class MapState < BasicGameState
       @y = 0 if @y < 0
       @x = @map.width-1 if @x >= @map.width
       @y = @map.height-1 if @y >= @map.height
+
+      game.player.pos = [@x,@y]
     end
 
     @world.update(container, delta)
