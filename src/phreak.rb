@@ -27,7 +27,7 @@ module Phreak
 
       # @ui_handler = UIHandler.new
 
-      # @world = World.new
+      @world = World.new
       # @world.ui_handler = @ui_handler
     end
 
