@@ -212,10 +212,12 @@ module Phreak
 
       # Render connection overlay
       @overlay_line_color ||= Color.new(0,0,255,255)
-      entity.associated_entities.each do |oentity|
-        epos = project(oentity.exact_pos[0], oentity.exact_pos[1])
-        @graphics.drawGradientLine(vx + (@tile_width / 2), vy + (@tile_height / 2), @overlay_line_color,
-                                   epos[0] + (@tile_width / 2), epos[1] + (@tile_height / 2), @overlay_line_color)
+      if entity.respond_to?(:crypto_key) && @player.known_crypto_key?(entity.crypto_key) then
+        entity.associated_entities.each do |oentity|
+          epos = project(oentity.exact_pos[0], oentity.exact_pos[1])
+          @graphics.drawGradientLine(vx + (@tile_width / 2), vy + (@tile_height / 2), @overlay_line_color,
+                                     epos[0] + (@tile_width / 2), epos[1] + (@tile_height / 2), @overlay_line_color)
+        end
       end
     end
 

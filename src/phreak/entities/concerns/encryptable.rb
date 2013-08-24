@@ -16,6 +16,7 @@ module Phreak
         def associate(entity)
           puts "#{self.inspect} associating with #{entity.inspect} = #{entity.crypto_key}"
           @associated_entities << entity
+          entity.associated_entities << self
           @known_crypto_keys << entity.crypto_key
           @known_crypto_keys.uniq!
         end
