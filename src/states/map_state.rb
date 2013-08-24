@@ -15,16 +15,17 @@ module Phreak
 
       @game  = game
       @world = @game.world
+      @player = @game.player
 
       @map = @world.map
 
-      @x = game.player.pos[0]
-      @y = game.player.pos[1]
+      @x = @player.pos[0]
+      @y = @player.pos[1]
 
       @sprites = SpriteSheet.new('data/spritesheet.png', 32, 32)
       @ground = @sprites.getSprite(0,0)
       @wall   = @sprites.getSprite(1,0)
-      @player = @sprites.getSprite(3,0)
+      @avatar = @sprites.getSprite(3,0)
 
       @cctv_cold = @sprites.getSprite(0,1)
       @cctv_hot  = @sprites.getSprite(1,1)
@@ -97,7 +98,7 @@ module Phreak
           @x = @map.width-1 if @x >= @map.width
           @y = @map.height-1 if @y >= @map.height
 
-          game.player.pos = [@x,@y]
+          @player.pos = [@x,@y]
         end
       end
 
@@ -108,7 +109,7 @@ module Phreak
       pos = deproject(x,y)
       target = @targets[pos]
       puts "CLICKED: #{pos.inspect} = #{target.inspect}"
-      @current_target = target
+      @player.current_target = target
     end
 
     def keyPressed(key, char_code)
@@ -127,8 +128,8 @@ module Phreak
           puts "1. DISABLE"
         end
       when '1'
-        if @device && @current_target && @current_target.respond_to?(:disable!) then
-          @current_target.disable!
+        if @device && @player.current_target && @player.current_target.respond_to?(:disable!) then
+          @player.current_target.disable!
         end
       when '2'
         if @device then
@@ -162,7 +163,7 @@ module Phreak
     def render_entity(entity, vx, vy, x, y)
       image = case entity
       when Entities::Player
-        @player
+        @avatar
       when Entities::CCTV, Entities::AccessPoint, Entities::Server
         @targets[[x,y]] = entity
         if entity.active? then
@@ -176,7 +177,7 @@ module Phreak
 
       image.draw(vx, vy, 1.0)
 
-      if entity == @current_target then
+      if entity == @player.current_target then
         @target_ui.draw(vx, vy, 1.0)
       end
     end

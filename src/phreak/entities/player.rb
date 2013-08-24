@@ -7,6 +7,8 @@ module Phreak
 
       include Concerns::Encryptable
 
+      attr_accessor :current_target
+
       def initialize(world)
         super
 
@@ -29,6 +31,7 @@ module Phreak
       def observe(pos, entity, frequency, data)
         if frequency == :wifi then
           return if @wiresniff_timer.nil? && data.encrypted? && !known_crypto_key?(data.crypto_key)
+
           puts "GOT: #{data.inspect}"
           @buffer << data
         end
