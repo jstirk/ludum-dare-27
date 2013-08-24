@@ -15,7 +15,7 @@ module Phreak
       @player.pos = [20,20]
     end
 
-    def update(delta)
+    def update(container, delta)
     end
 
   end
