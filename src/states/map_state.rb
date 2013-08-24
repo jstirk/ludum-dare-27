@@ -36,11 +36,14 @@ module Phreak
       @target_disconnected = @sprites.getSprite(2,2)
 
       @observed_overlay = @sprites.getSprite(0,3)
+
+      @phone = Image.new('data/phone.png')
     end
 
     def render(container, game, graphics)
       @targets = {}
       @graphics = graphics
+      @container = container
 
       @ox = (container.width >> 1) - (@x * @tile_width) - (@tile_width / 2)
       @oy = (container.height >> 1) - (@y * @tile_height) - (@tile_height / 2)
@@ -85,8 +88,8 @@ module Phreak
         render_entity(entity, evpos[0], evpos[1], epos[0], epos[1])
       end
 
-      # TODO: Render overlay to target
-      # TODO: Render device overlay if in that mode
+      # Render device overlay if in that mode
+      render_device_overlay
 
       graphics.draw_string("#{[@ix,@iy].inspect} (ESC to exit)", 8, container.height - 30)
     end
@@ -149,11 +152,6 @@ module Phreak
       when '`'
         # Open or close the device
         @device = !@device
-
-        if @device then
-          puts "1. DISABLE"
-          puts "1. SNIFF"
-        end
       when '1'
         if @device && @player.current_target && @player.current_target.respond_to?(:disable!) then
           @player.current_target.disable!
@@ -223,6 +221,21 @@ module Phreak
 
     def render_overlay(type, vx, vy, x, y)
       @observed_overlay.draw(vx, vy, 1.0)
+    end
+
+    def render_device_overlay
+      if @device then
+        @default_font_color ||= Color.new(255,255,255,255)
+        @device_font_color ||= Color.new(29,30,25,255)
+        ox = 30
+        oy = @container.height - 400
+        @phone.draw(ox, oy, 2.0)
+
+        @graphics.setColor(@device_font_color)
+        @graphics.draw_string("1. DISABLE", ox + 20, oy + 60)
+        @graphics.draw_string("2. SNIFF", ox + 20, oy + 80)
+        @graphics.setColor(@default_font_color)
+      end
     end
 
   end
