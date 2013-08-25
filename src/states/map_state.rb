@@ -28,6 +28,7 @@ module Phreak
       @ground = @sprites.getSprite(0,0)
       @wall   = @sprites.getSprite(1,0)
       @avatar = @sprites.getSprite(3,0)
+      @goon = @sprites.getSprite(4,0)
 
       @cctv_cold = @sprites.getSprite(0,1)
       @cctv_hot  = @sprites.getSprite(1,1)
@@ -207,6 +208,8 @@ module Phreak
       image = case entity
       when Entities::Player
         @avatar
+      when Entities::Goon
+        @goon
       when Entities::CCTV, Entities::AccessPoint, Entities::Server, Entities::CellTower
         @targets[[x,y]] = entity
         if entity.active? then

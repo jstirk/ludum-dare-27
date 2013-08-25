@@ -4,6 +4,7 @@ require 'phreak/entities/cctv'
 require 'phreak/entities/access_point'
 require 'phreak/entities/server'
 require 'phreak/entities/cell_tower'
+require 'phreak/entities/goon'
 require 'phreak/map'
 
 module Phreak
@@ -125,7 +126,8 @@ module Phreak
       cctvs = []
       server = nil
       cell_tower = nil
-      %w( S..................c
+      goon = nil
+      %w( Sg.................c
           ....................
           ..M.................
           ....................
@@ -157,6 +159,10 @@ module Phreak
           case character
           when 'P'
             @player.pos = [x,y]
+          when 'g'
+            goon = Entities::Goon.new(self)
+            register_entity(goon)
+            goon.pos = [x,y]
           when 'C' then
             cctv = Entities::CCTV.new(self)
             register_entity(cctv)
@@ -190,6 +196,7 @@ module Phreak
         cctv.associate(idf)
       end
       server.associate(cell_tower)
+      goon.associate(cell_tower)
     end
 
   end
