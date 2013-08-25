@@ -1,4 +1,5 @@
 require 'phreak/entities/base'
+require 'phreak/entities/concerns/transmitter'
 require 'phreak/entities/concerns/encryptable'
 
 module Phreak
@@ -11,21 +12,37 @@ module Phreak
     # dispatch Agents to, well, deadify you.
     class Server < Base
 
+      include Concerns::Transmitter
       include Concerns::Encryptable
 
       def initialize(world)
         super
 
         init_encryptable
+        init_transmitter
 
+        @inqueue = []
         @frequencies = { :wifi => 5 }
+        @transmit_frequency = :cell
+      end
+
+      def update(delta)
+        @inqueue.each do |packet|
+          if packet.data[:target].is_a?(Entities::Player) then
+            # Dispatch Goons to the given position
+            @buffer << Packet.new(packet.data.merge(:action => :kill))
+          end
+        end
+        @inqueue = []
+        update_encryptable(delta)
+        update_transmitter(delta)
       end
 
       def observe(pos, entity, frequency, data)
         if frequency == :wifi then
           return if data.hopped?(self)
           return if data.encrypted? && !known_crypto_key?(data.crypto_key)
-          puts "SERVER GOT: #{data.inspect} via #{data.hops}"
+          @inqueue << data
         end
       end
 
