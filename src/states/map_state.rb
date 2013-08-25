@@ -118,35 +118,42 @@ module Phreak
       container.exit if input.is_key_down(Input::KEY_ESCAPE)
 
       if @map then
+        nx = @x
+        ny = @y
+
         touched = false
         fragment = delta / 250.0
         if input.is_key_down(Input::KEY_A) then
-          @x -= 1.0 * fragment
+          nx -= 1.0 * fragment
           touched = true
         end
         if input.is_key_down(Input::KEY_D) then
-          @x += 1.0 * fragment
+          nx += 1.0 * fragment
           touched = true
         end
         if input.is_key_down(Input::KEY_W)
-          @y -= 1.0 * fragment
+          ny -= 1.0 * fragment
           touched = true
         end
         if input.is_key_down(Input::KEY_S)
-          @y += 1.0 * fragment
+          ny += 1.0 * fragment
           touched = true
         end
 
         if touched then
-          @x = 0 if @x < 0.0
-          @y = 0 if @y < 0.0
-          @x = @map.width-1 if @x >= @map.width
-          @y = @map.height-1 if @y >= @map.height
+          nx = 0 if nx < 0.0
+          ny = 0 if ny < 0.0
+          nx = @map.width-1 if nx >= @map.width
+          ny = @map.height-1 if ny >= @map.height
 
-          @ix = @x.floor
-          @iy = @y.floor
+          @ix = nx.floor
+          @iy = ny.floor
 
-          @player.exact_pos = [ @x,@y ]
+          if !@world.map.blocked(nil, @ix, @iy) then
+            @player.exact_pos = [ nx,ny ]
+            @x = nx
+            @y = ny
+          end
         end
       end
 

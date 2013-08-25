@@ -1,5 +1,10 @@
+java_import org.newdawn.slick.util.pathfinding.TileBasedMap
+java_import org.newdawn.slick.util.pathfinding.AStarPathFinder
+
 module Phreak
   class Map
+
+    include org.newdawn.slick.util.pathfinding.TileBasedMap
 
     attr_reader :width, :height
 
@@ -25,6 +30,32 @@ module Phreak
       "#<#{self.class.name}>"
     end
     alias :inspect :to_s
+
+    def pathfinder
+      AStarPathFinder.new(self, @width + @height, true)
+    end
+
+    def getWidthInTiles
+      @width
+    end
+
+    def getHeightInTiles
+      @height
+    end
+
+    def getCost(context, tx, ty)
+      dx = (context.sourceX - tx).abs
+      dy = (context.sourceY - ty).abs
+
+      Math.sqrt((dx**2) + (dy**2))
+    end
+
+    def blocked(context, tx, ty)
+      @cells[[tx, ty]][:type] == :wall
+    end
+
+    def pathFinderVisited(x,y)
+    end
 
   private
 
