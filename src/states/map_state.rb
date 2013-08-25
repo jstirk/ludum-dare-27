@@ -207,7 +207,7 @@ module Phreak
       image = case entity
       when Entities::Player
         @avatar
-      when Entities::CCTV, Entities::AccessPoint, Entities::Server
+      when Entities::CCTV, Entities::AccessPoint, Entities::Server, Entities::CellTower
         @targets[[x,y]] = entity
         if entity.active? then
           @cctv_hot
