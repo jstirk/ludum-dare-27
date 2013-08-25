@@ -39,6 +39,7 @@ module Phreak
             when Player
               @buffer << Packet.new({ :target => entity, :pos => pos })
             else
+              @buffer << Packet.new({ :motion => true, :pos => pos })
               @motion = true
             end
           end
